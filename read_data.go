@@ -35,8 +35,8 @@ type Data struct {
 
 func main() {
 	http.HandleFunc("/webhook", handleWebhook)
-	fmt.Println("Server is running on http://localhost:3001")
-	if err := http.ListenAndServe(":3001", nil); err != nil {
+	fmt.Println("Server is running on http://localhost:3000")
+	if err := http.ListenAndServe(":3000", nil); err != nil {
 		fmt.Printf("Failed to start server: %v\n", err)
 	}
 }
