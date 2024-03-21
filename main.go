@@ -67,7 +67,7 @@ func handleWebhook(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	isValid := isValidData(webhookData)
+	isValid := isValidData(webhookData, checksumKey)
 	fmt.Println("Is valid:", isValid)
 
 	// Your further processing logic here
@@ -78,7 +78,7 @@ func handleWebhook(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("Webhook received successfully"))
 }
 
-func isValidData(data Data) bool {
+func isValidData(data Data, checksumKey string) bool {
 	dataQueryStr := convertObjToQueryStr(data.Data)
 	dataToSignature := hmac.New(sha256.New, []byte(checksumKey))
 	dataToSignature.Write([]byte(dataQueryStr))
