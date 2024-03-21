@@ -70,12 +70,28 @@ func handleWebhook(w http.ResponseWriter, r *http.Request) {
 	isValid := isValidData(webhookData, checksumKey)
 	fmt.Println("Is valid:", isValid)
 
-	// Your further processing logic here
-	// For example, you can access webhookData.Data fields like webhookData.Data.OrderCode, webhookData.Data.Amount, etc.
+	fmt.Println("Code:", webhookData.Code)
+	fmt.Println("Desc:", webhookData.Desc)
+	fmt.Println("Data:", webhookData.Data)
+	fmt.Println("Signature:", webhookData.Signature)
+	fmt.Println("Order code:", webhookData.Data.OrderCode)
+	fmt.Println("Amount:", webhookData.Data.Amount)
+	fmt.Println("Description:", webhookData.Data.Description)
+	fmt.Println("Account number:", webhookData.Data.AccountNumber)
+	fmt.Println("Reference:", webhookData.Data.Reference)
+	fmt.Println("Transaction date time:", webhookData.Data.TransactionDateTime)
+	fmt.Println("Currency:", webhookData.Data.Currency)
+	fmt.Println("Payment link ID:", webhookData.Data.PaymentLinkId)
+	fmt.Println("Counter account bank ID:", webhookData.Data.CounterAccountBankId)
+	fmt.Println("Counter account bank name:", webhookData.Data.CounterAccountBankName)
+	fmt.Println("Counter account name:", webhookData.Data.CounterAccountName)
+	fmt.Println("Counter account number:", webhookData.Data.CounterAccountNumber)
+	fmt.Println("Virtual account name:", webhookData.Data.VirtualAccountName)
+	fmt.Println("Virtual account number:", webhookData.Data.VirtualAccountNumber)
+	fmt.Println("Signature:", webhookData.Signature)
 
 	// Respond to the webhook request
 	w.WriteHeader(http.StatusOK)
-	w.Write([]byte("Webhook received successfully"))
 }
 
 func isValidData(data Data, checksumKey string) bool {
