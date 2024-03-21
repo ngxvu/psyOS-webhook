@@ -11,11 +11,16 @@ import (
 	"strings"
 )
 
-var checksumKey = "1a54716c8f0efb2744fb28b6e38b25da7f67a925d98bc1c18bd8faaecadd7675"
+var checksumKey = "c548f46e2e5efa987944e750277c515532cfd13a8843a08a78c1f9cef556121c"
 
 type Data struct {
-	Code                   string `json:"code"`
-	Desc                   string `json:"desc"`
+	Code      string      `json:"code"`
+	Desc      string      `json:"desc"`
+	Data      DataPayload `json:"data"`
+	Signature string      `json:"signature"`
+}
+
+type DataPayload struct {
 	OrderCode              int    `json:"orderCode"`
 	Amount                 int    `json:"amount"`
 	Description            string `json:"description"`
@@ -24,7 +29,8 @@ type Data struct {
 	TransactionDateTime    string `json:"transactionDateTime"`
 	Currency               string `json:"currency"`
 	PaymentLinkId          string `json:"paymentLinkId"`
-	Signature              string `json:"signature"`
+	Code                   string `json:"code"`
+	Desc                   string `json:"desc"`
 	CounterAccountBankId   string `json:"counterAccountBankId"`
 	CounterAccountBankName string `json:"counterAccountBankName"`
 	CounterAccountName     string `json:"counterAccountName"`
@@ -61,31 +67,29 @@ func handleWebhook(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	isValid := isValidData(webhookData, webhookData.Signature, checksumKey)
+	isValid := isValidData(webhookData)
 	fmt.Println("Is valid:", isValid)
 
 	// Your further processing logic here
-	// For example, you can access webhookData fields like webhookData.Code, webhookData.Amount, etc.
+	// For example, you can access webhookData.Data fields like webhookData.Data.OrderCode, webhookData.Data.Amount, etc.
 
 	// Respond to the webhook request
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("Webhook received successfully"))
 }
 
-func isValidData(data Data, signature string, key string) bool {
-	dataQueryStr := convertObjToQueryStr(data)
-	dataToSignature := hmac.New(sha256.New, []byte(key))
+func isValidData(data Data) bool {
+	dataQueryStr := convertObjToQueryStr(data.Data)
+	dataToSignature := hmac.New(sha256.New, []byte(checksumKey))
 	dataToSignature.Write([]byte(dataQueryStr))
 	expectedSignature := hex.EncodeToString(dataToSignature.Sum(nil))
-	return expectedSignature == signature
+	return expectedSignature == data.Signature
 }
 
-func convertObjToQueryStr(obj Data) string {
+func convertObjToQueryStr(obj DataPayload) string {
 	var queryStrings []string
 
 	objMap := map[string]interface{}{
-		"code":                   obj.Code,
-		"desc":                   obj.Desc,
 		"orderCode":              obj.OrderCode,
 		"amount":                 obj.Amount,
 		"description":            obj.Description,
@@ -94,7 +98,8 @@ func convertObjToQueryStr(obj Data) string {
 		"transactionDateTime":    obj.TransactionDateTime,
 		"currency":               obj.Currency,
 		"paymentLinkId":          obj.PaymentLinkId,
-		"signature":              obj.Signature,
+		"code":                   obj.Code,
+		"desc":                   obj.Desc,
 		"counterAccountBankId":   obj.CounterAccountBankId,
 		"counterAccountBankName": obj.CounterAccountBankName,
 		"counterAccountName":     obj.CounterAccountName,
